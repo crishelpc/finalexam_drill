@@ -61,13 +61,15 @@ def get_patient_admission(patient_id):
             404)
     return make_response(jsonify(data), 200)
 
-@app.route("/healthprofessionals/<int:staff_id>", methods=["GET"])
-def get_staff_info(staff_id):
-    data = data_fetch("""SELECT staffID, staffName, staffPhone
-        FROM HealthProfessionals
-        WHERE staffID = %s""", (staff_id,))
+@app.route("/healthprofessionals/<int:staff_id>/patients", methods=["GET"])
+def get_patients_info(staff_id):
+    data = data_fetch("""SELECT Patients.patientID, Patients.patientFirstName, Patients.patientLastName, 
+               Patients.patientHomePhone, Patients.patientEmailAddress
+        FROM Treatments
+        JOIN Patients ON Treatments.patientID = Patients.patientID
+        WHERE Treatments.staffID = %s""", (staff_id,))
     if not data:
-        return make_response(jsonify({"error": "Health professional not found"}), 404)
+        return make_response(jsonify({"error": "No patients found for this health professional"}), 404)
     return make_response(jsonify(data), 200)
 
 @app.route("/treatments/<int:patient_id>", methods=["GET"])
